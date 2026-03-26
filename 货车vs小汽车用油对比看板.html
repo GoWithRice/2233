@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>货车 vs 小汽车用油对比看板</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00665F;
+            --primary-light: #EEF0F5;
+            --primary-bg: #0D6A63;
+            --secondary: #CEA472;
+            --accent: #F3AF00;
+            --accent-light: #FFF9E6;
+            --bg: #EEF0F5;
+            --card-bg: #FFFFFF;
+            --text-primary: #0F0F0F;
+            --text-secondary: #666666;
+            --border: #E5E6EB;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #00665F 0%, #005255 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border);
+            font-weight: 600;
+        }
+
+        /* 表格样式 */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .comparison-table th {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comparison-table th:not(:first-child),
+        .comparison-table td:not(:first-child) {
+            text-align: center;
+        }
+
+        .comparison-table tr:hover {
+            background: var(--primary-light);
+        }
+
+        /* 卡片样式 */
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0, 102, 95, 0.12);
+        }
+
+        .card-title {
+            font-size: 16px;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            font-weight: 600;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-content {
+            font-size: 14px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .card-content ul {
+            list-style: none;
+        }
+
+        .card-content li {
+            padding: 6px 0;
+        }
+
+        .card-content strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* 可视化图表 */
+        .chart-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .chart-card {
+            background: var(--primary-light);
+            padding: 24px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .chart-card h3 {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .chart-value {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .chart-value.truck {
+            color: var(--primary);
+        }
+
+        .chart-value.car {
+            color: var(--secondary);
+        }
+
+        .chart-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .bar-container {
+            margin-top: 16px;
+            background: white;
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        .bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .bar-fill.truck {
+            background: var(--primary);
+            height: 100%;
+        }
+
+        .bar-fill.car {
+            background: var(--secondary);
+            height: 100%;
+        }
+
+        .chart-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 102, 95, 0.18);
+        }
+
+        .summary-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 102, 95, 0.12);
+        }
+
+        .summary-box:last-child:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(206, 164, 114, 0.12);
+        }
+
+        /* 总结部分 */
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .summary-box {
+            background: var(--primary-light);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .summary-box:last-child {
+            border-left-color: var(--secondary);
+            background: var(--accent-light);
+        }
+
+        .summary-box h3 {
+            font-size: 15px;
+            color: var(--text-primary);
+            margin-bottom: 14px;
+            font-weight: 600;
+        }
+
+        .summary-box ul {
+            list-style: none;
+        }
+
+        .summary-box li {
+            padding: 6px 0;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .summary-box li strong {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .summary-box:last-child li strong {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .cards-container,
+            .chart-container,
+            .summary {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .comparison-table {
+                font-size: 12px;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>货车 vs 小汽车用油对比</h1>
+            <p>柴油 · 汽油 · 一图看懂</p>
+        </div>
+
+        <div class="main-content">
+            <!-- 对比表格 -->
+            <div class="section">
+                <h2 class="section-title">核心对比</h2>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>对比项目</th>
+                            <th>🚛 货车</th>
+                            <th>🚗 小汽车</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>燃油</strong></td>
+                            <td>柴油</td>
+                            <td>汽油</td>
+                        </tr>
+                        <tr>
+                            <td><strong>标号</strong></td>
+                            <td>0号 / -10号 / -20号 / -35号</td>
+                            <td>92号 / 95号 / 98号</td>
+                        </tr>
+                        <tr>
+                            <td><strong>单价（元/升）</strong></td>
+                            <td>≈7.2 / ≈7.3 / ≈7.4 / ≈7.5</td>
+                            <td>≈7.5 / ≈8.1 / ≈8.3</td>
+                        </tr>
+                        <tr>
+                            <td><strong>油价上涨后单价（元/升）</strong></td>
+                            <td>≈8.1 / ≈8.2 / ≈8.3 / ≈8.4</td>
+                            <td>≈8.5 / ≈9.1 / ≈9.3</td>
+                        </tr>
+                        <tr>
+                            <td><strong>标号选择依据</strong></td>
+                            <td>按照气温选择，温度越低选择的标号越小</td>
+                            <td>发动机要求</td>
+                        </tr>
+                        <tr>
+                            <td><strong>特点</strong></td>
+                            <td>压燃式发动机，靠高压压缩自然<br>扭矩大、省油、耐造</td>
+                            <td>点燃式发动机，靠火花塞点燃<br>安静、顺滑、好开</td>
+                        </tr>
+                        <tr>
+                            <td><strong>油箱容量</strong></td>
+                            <td>200-800L</td>
+                            <td>≈50L</td>
+                        </tr>
+                        <tr>
+                            <td><strong>油价上涨影响</strong></td>
+                            <td>每箱约上涨380元</td>
+                            <td>每箱约上涨40元</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 12px;">* 货车油箱容量按车型差异大：微货60-120L，轻卡150-300L，中卡300-500L，重卡400-800L。380元为中型车按400油箱估算值。</p>
+            </div>
+
+            <!-- 可视化数据 -->
+            <div class="section">
+                <h2 class="section-title">数据概览</h2>
+                <div class="chart-container" style="grid-template-columns: repeat(2, 1fr);">
+                    <div class="chart-card">
+                        <h3>🚛 货车</h3>
+                        <div style="font-size: 16px; color: var(--primary); margin-bottom: 16px; font-weight: 500;">≈8.1元/L</div>
+                        <div class="chart-value truck">+380元</div>
+                        <div class="chart-label" style="font-size: 14px; font-weight: 500;">每箱约上涨</div>
+                        <div class="bar-container" style="margin-top: 24px; margin-bottom: 8px;">
+                            <div class="bar"><div class="bar-fill truck" style="width: 100%"></div></div>
+                        </div>
+                        <div class="chart-label">油箱容量：400L</div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>🚗 小汽车</h3>
+                        <div style="font-size: 16px; color: var(--accent); margin-bottom: 16px; font-weight: 500;">≈8.5元/L（92号）</div>
+                        <div class="chart-value car">+40元</div>
+                        <div class="chart-label" style="font-size: 14px; font-weight: 500;">每箱约上涨</div>
+                        <div class="bar-container" style="margin-top: 24px; margin-bottom: 8px;">
+                            <div class="bar"><div class="bar-fill car" style="width: 12.5%"></div></div>
+                        </div>
+                        <div class="chart-label">油箱容量：50L</div>
+                    </div>
+                </div>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 12px;">* 货车按400L油箱中型车估算，小汽车按普通家用车估算。</p>
+            </div>
+
+            <!-- 核心要点 -->
+            <div class="section">
+                <h2 class="section-title">核心要点</h2>
+                <div class="summary">
+                    <div class="summary-box">
+                        <h3>🚛 货车</h3>
+                        <ul>
+                            <li><strong>燃油：</strong>柴油为主</li>
+                            <li><strong>选号：</strong>按气温，不看车型</li>
+                            <li><strong>特点：</strong>压燃式发动机，靠高压压缩自然；扭矩大、省油、耐造</li>
+                            <li><strong>油价上涨后：</strong>≈8.1元/L</li>
+                        </ul>
+                    </div>
+                    <div class="summary-box">
+                        <h3>🚗 小汽车</h3>
+                        <ul>
+                            <li><strong>燃油：</strong>汽油为主</li>
+                            <li><strong>选号：</strong>看发动机/油箱盖</li>
+                            <li><strong>特点：</strong>点燃式发动机，靠火花塞点燃；安静、顺滑、好开</li>
+                            <li><strong>油价上涨后：</strong>92号≈8.5元/L</li>
+                        </ul>
+                    </div>
+                </div>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 16px; padding: 12px; background: var(--primary-light); border-radius: 8px;">⚠️ 注意：柴油和汽油不能互换，同类燃油不同标号最好不要混用，按照发动机或气温要求使用正确标号的燃油</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
